@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#EDEDED">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>财务卡片</title>
@@ -17,14 +17,20 @@
     --sub:#888888;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{height:100%;}
+  
+  /* 修复黑边：给 html 和 body 设置背景色，覆盖全屏 */
+  html, body {
+    height: 100%;
+    background-color: var(--bg);
+    margin: 0;
+    padding: 0;
+  }
   body{
-    margin:0;
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
-    background:var(--bg);
     color:var(--text);
     overscroll-behavior:none;
     -webkit-font-smoothing:antialiased;
+    overflow: hidden; /* 防止整体页面滚动 */
   }
   [hidden]{display:none !important;}
 
@@ -87,33 +93,37 @@
     margin-bottom:12px;
     box-shadow:0 1px 2px rgba(0,0,0,.03);
     position:relative;
+    min-height:88px;
   }
-  .summary-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-  .summary-label{font-size:13px;color:var(--sub);}
+  .summary-label{font-size:13px;color:var(--sub);margin-bottom:8px;}
   .summary-value{font-size:30px;font-weight:600;letter-spacing:-.6px;font-variant-numeric:tabular-nums;line-height:1.1;}
   .pos{color:var(--green);}
   .neg{color:var(--red);}
 
-  /* “•••”改小 */
-  .dots-btn{
+  .cal-toggle{
     position:absolute;
-    right:12px;
-    top:50%;
-    transform:translateY(-50%);
+    right:0;
+    top:0;
+    bottom:0;
+    width:25%;
     border:none;
     background:transparent;
-    font-size:14px;
-    line-height:1;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    padding:0 18px 0 0;
     color:#999;
-    letter-spacing:0;
-    padding:8px 9px;
-    cursor:pointer;
-    border-radius:6px;
+    font-size:20px;
+    font-weight:600;
     font-family:inherit;
-    z-index:1;
+    line-height:1;
+    cursor:pointer;
+    border-radius:0 12px 12px 0;
+    z-index:2;
+    transition:background .12s,color .12s;
   }
-  .dots-btn:active{background:#F0F0F0;}
-  .dots-btn.active{color:var(--green);}
+  .cal-toggle:active{background:rgba(0,0,0,.03);}
+  .cal-toggle.active{color:var(--green);}
 
   .sub-cards{display:flex;gap:10px;margin-bottom:12px;}
   .mini-card{flex:1;background:var(--card);border-radius:12px;padding:14px 12px;box-shadow:0 1px 2px rgba(0,0,0,.03);min-width:0;}
@@ -142,8 +152,8 @@
   .item-meta{font-size:12px;color:#999;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .item-amount{font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;}
   .tag{display:inline-block;font-size:10px;background:#F0F0F0;color:#888;border-radius:4px;padding:1px 5px;margin-left:4px;vertical-align:1px;}
+  .tag-monthly{background:#E8F8EE;color:var(--green);}
 
-  /* 每日支出 */
   .daily-expense-card{
     background:var(--card);
     border-radius:12px;
@@ -219,7 +229,6 @@
   .daily-record.empty-rec:active{background:transparent;}
   .rec-time{font-size:11px;color:#BBB;margin-left:6px;}
 
-  /* 日历 */
   .calendar{
     background:var(--card);
     border-radius:12px;
@@ -238,6 +247,35 @@
   .cal-nav:active{background:#E0E0E0;}
   .cal-title{font-size:15px;font-weight:600;min-width:64px;text-align:center;}
   .cal-total{margin-left:auto;font-size:12px;color:var(--red);font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .cal-total.cal-clickable{
+    cursor:pointer;
+    text-decoration:underline dotted;
+    text-underline-offset:3px;
+    padding:4px 0 4px 6px;
+    border-radius:4px;
+  }
+  .cal-total.cal-clickable:active{background:#F5F5F5;}
+  .cal-total.cal-clickable.active{color:var(--green);text-decoration-color:var(--green);}
+
+  .cal-sum-list{
+    background:#FAFAFA;
+    border-radius:8px;
+    padding:6px 12px;
+    margin:0 0 8px;
+  }
+  .cal-sum-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:6px 0;
+    border-bottom:0.5px dashed #EEE;
+    font-size:13px;
+  }
+  .cal-sum-row:last-child{border-bottom:none;}
+  .cal-sum-name{color:#444;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px;}
+  .cal-sum-amt{color:var(--red);font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:500;}
+  .cal-sum-empty{color:#BBB;text-align:center;font-size:12px;padding:8px 0;}
+
   .cal-week{display:grid;grid-template-columns:repeat(7,1fr);font-size:11px;color:#AAA;text-align:center;margin-bottom:4px;}
   .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
   .cal-cell{
@@ -301,9 +339,10 @@
   .tab span{line-height:1.2;}
   .tab.active{color:var(--green);}
 
+  /* 修复键盘遮挡：确保 mask 定位和高度可以自适应 */
   .mask{
     position:fixed;
-    inset:0;
+    top:0; right:0; bottom:0; left:0;
     background:rgba(0,0,0,.45);
     display:flex;
     align-items:flex-end;
@@ -314,6 +353,7 @@
     z-index:100;
   }
   .mask.show{opacity:1;pointer-events:auto;}
+  
   .sheet{
     width:100%;
     max-width:560px;
@@ -322,7 +362,7 @@
     padding:20px 16px calc(18px + env(safe-area-inset-bottom));
     transform:translateY(100%);
     transition:transform .26s cubic-bezier(.25,.8,.35,1);
-    max-height:88vh;
+    max-height:100%; /* 改为 100%，高度受父容器约束，防止键盘弹出时被遮挡 */
     overflow-y:auto;
   }
   .mask.show .sheet{transform:translateY(0);}
@@ -473,7 +513,7 @@
 </div>
 
 <div class="mask" id="mask">
-  <div class="sheet">
+  <div class="sheet" id="sheet">
     <div class="sheet-title" id="sheetTitle">添加收入</div>
 
     <div class="field">
@@ -496,6 +536,25 @@
       <select id="liquidInput">
         <option value="1">是（现金、股票、基金等）</option>
         <option value="0">否（房产、企业等不动产）</option>
+      </select>
+    </div>
+
+    <div class="field" id="expenseTypeField" hidden>
+      <label>支出类型</label>
+      <select id="expenseTypeInput">
+        <option value="normal">普通支出（一次性）</option>
+        <option value="monthly">每月支出（固定日期自动扣款）</option>
+      </select>
+    </div>
+
+    <div class="field" id="monthlyDayField" hidden>
+      <label>每月扣款日期（1-31）</label>
+      <input id="monthlyDayInput" type="number" min="1" max="31" placeholder="例如：9">
+    </div>
+    <div class="field" id="linkedLiabilityField" hidden>
+      <label>关联负债（可选）</label>
+      <select id="linkedLiabilityInput">
+        <option value="">不关联</option>
       </select>
     </div>
 
@@ -548,13 +607,12 @@
   var DEFAULT_DAILY_TAGS = ['早餐','午餐','晚餐','购物','娱乐','烟酒','交通','医疗'];
 
   var PRESET = {
-    income:    ['工资收入', '利息收入', '股利收入', '房租收入', '企业收入', '其他收入'],
-    expense:   ['所得税', '住房支出', '食物支出', '交通支出', '娱乐支出', '保险费', '医疗支出', '子女教育', '其他支出'],
-    asset:     ['现金 / 储蓄', '股票', '基金 / 债券', '房地产', '企业投资'],
-    liability: ['房贷', '车贷', '信用卡欠款', '消费贷款', '助学贷款']
+    income:    ['工资收入'],
+    expense:   [],
+    asset:     ['现金/储蓄'],
+    liability: ['房贷', '车贷']
   };
 
-  /* ========= 基础工具 ========= */
   function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
   function round2(n){ return Math.round((Number(n) || 0) * 100) / 100; }
   function fmt(n){
@@ -629,12 +687,20 @@
     return curKey;
   }
 
-  /* ========= 数据模型 ========= */
+  function isFixedItem(t, name){
+    if(t === 'income' && name === '工资收入') return true;
+    if(t === 'asset' && (name === '现金/储蓄' || name === '现金 / 储蓄')) return true;
+    return false;
+  }
+
   function makeItem(t, name, amount){
     var base = { id: uid(), name: name, amount: amount || 0 };
-    if(t === 'income') return Object.assign(base, { day: 0, received: 0, lastSettledMonth: null });
-    if(t === 'expense') return Object.assign(base, { auto: false, month: '', daily: false, date: '', time: 0 });
-    if(t === 'asset') return Object.assign(base, { liquid: name.indexOf('房地产') === -1 });
+    if(t === 'income') return Object.assign(base, { day: 0, received: 0, lastSettledMonth: null, fixed: isFixedItem(t, name) });
+    if(t === 'expense') return Object.assign(base, {
+      auto: false, month: '', daily: false, date: '', time: 0,
+      monthly: false, monthlyDay: 0, linkedLiabilityId: '', paidTotal: 0, lastSettledMonth: null
+    });
+    if(t === 'asset') return Object.assign(base, { liquid: name.indexOf('房地产') === -1, fixed: isFixedItem(t, name) });
     if(t === 'liability') return Object.assign(base, { totalAmount: 0, periods: 0, monthlyPayment: 0, repayDay: 0, paidPeriods: 0, lastSettledMonth: null });
   }
 
@@ -651,9 +717,16 @@
     var id = x.id ? String(x.id) : uid();
     var name = x.name != null ? String(x.name) : '';
     var amount = Number(x.amount) || 0;
-    if(t === 'income') return { id: id, name: name, amount: amount, day: Number(x.day) || 0, received: Number(x.received) || 0, lastSettledMonth: x.lastSettledMonth || null };
-    if(t === 'expense') return { id: id, name: name, amount: amount, auto: !!x.auto, month: x.month || '', daily: !!x.daily, date: x.date || '', time: Number(x.time) || 0 };
-    if(t === 'asset') return { id: id, name: name, amount: amount, liquid: x.liquid !== false };
+    if(t === 'income') return { id: id, name: name, amount: amount, day: Number(x.day) || 0, received: Number(x.received) || 0, lastSettledMonth: x.lastSettledMonth || null, fixed: isFixedItem(t, name) };
+    if(t === 'expense') return {
+      id: id, name: name, amount: amount, auto: !!x.auto, month: x.month || '',
+      daily: !!x.daily, date: x.date || '', time: Number(x.time) || 0,
+      monthly: !!x.monthly, monthlyDay: Number(x.monthlyDay) || 0,
+      linkedLiabilityId: x.linkedLiabilityId ? String(x.linkedLiabilityId) : '',
+      paidTotal: Number(x.paidTotal) || 0,
+      lastSettledMonth: x.lastSettledMonth || null
+    };
+    if(t === 'asset') return { id: id, name: name, amount: amount, liquid: x.liquid !== false, fixed: isFixedItem(t, name) };
     if(t === 'liability') return { id: id, name: name, amount: amount, totalAmount: Number(x.totalAmount) || 0, periods: Number(x.periods) || 0, monthlyPayment: Number(x.monthlyPayment) || 0, repayDay: Number(x.repayDay) || 0, paidPeriods: Number(x.paidPeriods) || 0, lastSettledMonth: x.lastSettledMonth || null };
   }
 
@@ -683,6 +756,7 @@
   var calYear = (new Date()).getFullYear();
   var calMonth = (new Date()).getMonth();
   var calSelectedDate = todayDateKey();
+  var calSumMode = '';
   var lastDayKey = todayDateKey();
 
   function saveState(){
@@ -695,17 +769,17 @@
 
   var currentTab = 'income';
   var editingId = null;
-  var sheetMode = 'item';          // 'item' | 'daily' | 'tag'
+  var sheetMode = 'item';
   var pendingDeleteCode = '';
-  var pendingDeleteType = 'item';  // 'item' | 'tag'
+  var pendingDeleteType = 'item';
   var pendingTagName = '';
   var currentDailyTag = '';
 
-  /* ========= DOM ========= */
   var titleEl      = document.getElementById('title');
   var contentEl    = document.getElementById('content');
   var addBtn       = document.getElementById('addBtn');
   var maskEl       = document.getElementById('mask');
+  var sheetEl      = document.getElementById('sheet');
   var sheetTitleEl = document.getElementById('sheetTitle');
   var nameInput    = document.getElementById('nameInput');
   var amountInput  = document.getElementById('amountInput');
@@ -715,6 +789,12 @@
   var dayInput     = document.getElementById('dayInput');
   var liquidField  = document.getElementById('liquidField');
   var liquidInput  = document.getElementById('liquidInput');
+  var expenseTypeField = document.getElementById('expenseTypeField');
+  var expenseTypeInput = document.getElementById('expenseTypeInput');
+  var monthlyDayField = document.getElementById('monthlyDayField');
+  var monthlyDayInput = document.getElementById('monthlyDayInput');
+  var linkedLiabilityField = document.getElementById('linkedLiabilityField');
+  var linkedLiabilityInput = document.getElementById('linkedLiabilityInput');
   var loanFields   = document.getElementById('loanFields');
   var totalInput   = document.getElementById('totalInput');
   var periodsInput = document.getElementById('periodsInput');
@@ -731,7 +811,34 @@
   var confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
   var tabBtns      = document.querySelectorAll('.tab');
 
-  /* ========= 计算辅助 ========= */
+  /* 修复键盘遮挡：监听可视区域高度变化 */
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', function() {
+      if (maskEl.classList.contains('show')) {
+        var vv = window.visualViewport;
+        // 如果可视高度小于窗口高度，说明键盘弹起了
+        if (vv.height < window.innerHeight - 50) {
+          maskEl.style.height = vv.height + 'px';
+          maskEl.style.top = vv.offsetTop + 'px';
+          maskEl.style.bottom = 'auto';
+        } else {
+          maskEl.style.height = '';
+          maskEl.style.top = '';
+          maskEl.style.bottom = '';
+        }
+      }
+    });
+  }
+
+  // 输入框获得焦点时，稍微滚动一下确保可见
+  [nameInput, amountInput].forEach(function(input) {
+    input.addEventListener('focus', function() {
+      setTimeout(function() {
+        input.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }, 300);
+    });
+  });
+
   function liabilityRemaining(item){
     if(item.periods > 0 && item.monthlyPayment > 0 && item.repayDay > 0){
       var rem = item.totalAmount - item.paidPeriods * item.monthlyPayment;
@@ -744,13 +851,75 @@
     var cash = state.asset.filter(function(a){ return a.liquid && /现金|储蓄|存款/.test(a.name); })[0];
     if(!cash) cash = state.asset.filter(function(a){ return a.liquid; })[0];
     if(!cash){
-      cash = { id: uid(), name: '现金/储蓄', amount: 0, liquid: true };
+      cash = { id: uid(), name: '现金/储蓄', amount: 0, liquid: true, fixed: true };
       state.asset.push(cash);
     }
     cash.amount = round2(cash.amount + delta);
   }
 
-  /* ========= 自动结算（收入到账 / 贷款还款） ========= */
+  function buildLiabilityOptions(selectedId){
+    var html = '<option value="">不关联</option>';
+    state.liability.forEach(function(l){
+      var rem = liabilityRemaining(l);
+      html += '<option value="' + esc(l.id) + '">' + esc(l.name) + '（剩余 ¥' + rem.toFixed(2) + '）</option>';
+    });
+    linkedLiabilityInput.innerHTML = html;
+    if(selectedId) linkedLiabilityInput.value = selectedId;
+  }
+
+  function calcAllExpenseTotals(){
+    var byYear = {}, byMonth = {};
+    function add(mk, amount){
+      if(!mk) return;
+      byMonth[mk] = round2((byMonth[mk] || 0) + amount);
+      var yk = mk.slice(0,4);
+      byYear[yk] = round2((byYear[yk] || 0) + amount);
+    }
+    state.expense.forEach(function(e){
+      if(e.monthly || e.auto) return;
+      var d = e.date;
+      if(!d) return;
+      add(d.slice(0,7), e.amount);
+    });
+    state.ledger.forEach(function(r){
+      if(r.type !== 'expense') return;
+      var mk = r.month || (r.date ? r.date.slice(0,7) : '');
+      if(!mk) return;
+      add(mk, r.amount);
+    });
+    return { byYear: byYear, byMonth: byMonth };
+  }
+
+  function getExpenseSummary(mode){
+    var y = calYear, m = calMonth;
+    var monthKey = y + '-' + pad2(m + 1);
+    var yearStr = String(y);
+    var agg = {};
+    function add(name, amount){
+      if(!name) name = '未分类';
+      agg[name] = round2((agg[name] || 0) + amount);
+    }
+    state.expense.forEach(function(e){
+      if(e.monthly || e.auto) return;
+      var d = e.date;
+      if(!d) return;
+      var ok = mode === 'year' ? (d.slice(0,4) === yearStr) : (d.slice(0,7) === monthKey);
+      if(!ok) return;
+      add(e.name, e.amount);
+    });
+    state.ledger.forEach(function(r){
+      if(r.type !== 'expense') return;
+      var mk = r.month || (r.date ? r.date.slice(0,7) : '');
+      if(!mk) return;
+      var ok = mode === 'year' ? (mk.slice(0,4) === yearStr) : (mk === monthKey);
+      if(!ok) return;
+      add(r.name, r.amount);
+    });
+    var arr = Object.keys(agg).map(function(k){ return { name: k, amount: agg[k] }; });
+    arr.sort(function(a, b){ return b.amount - a.amount; });
+    return arr;
+  }
+
   function settle(){
     var now = new Date();
     var todayD = now.getDate();
@@ -780,7 +949,55 @@
       });
     });
 
+    state.expense.forEach(function(item){
+      if(!item.monthly) return;
+      if(!item.monthlyDay || item.monthlyDay <= 0 || !item.amount || item.amount <= 0) return;
+
+      if(item.linkedLiabilityId){
+        var liab0 = state.liability.filter(function(x){ return x.id === item.linkedLiabilityId; })[0];
+        if(liab0){
+          if(liab0.periods > 0 && liab0.paidPeriods >= liab0.periods) return;
+          if(liab0.periods <= 0 && liab0.amount <= 0) return;
+        }
+      }
+
+      if(!item.lastSettledMonth){
+        item.lastSettledMonth = initLastSettled(item.monthlyDay);
+        changed = true;
+        return;
+      }
+      var months = monthsBetween(item.lastSettledMonth, curKey);
+      months.forEach(function(mk){
+        var y = parseInt(mk.slice(0,4),10);
+        var m = parseInt(mk.slice(5,7),10) - 1;
+        var day = Math.min(item.monthlyDay, daysInMonth(y, m));
+        if(mk === curKey && day > todayD) return;
+
+        addToCash(-item.amount);
+        item.paidTotal = round2((item.paidTotal || 0) + item.amount);
+        item.lastSettledMonth = mk;
+
+        if(item.linkedLiabilityId){
+          var l2 = state.liability.filter(function(x){ return x.id === item.linkedLiabilityId; })[0];
+          if(l2){
+            if(l2.periods > 0 && l2.monthlyPayment > 0){
+              l2.paidPeriods = Math.min(l2.paidPeriods + 1, l2.periods);
+            } else {
+              l2.amount = round2(Math.max(0, l2.amount - item.amount));
+            }
+          }
+        }
+
+        state.ledger.push({ id: uid(), type: 'expense', name: item.name, amount: item.amount, month: mk, time: Date.now() });
+        changed = true;
+      });
+    });
+
     state.liability.forEach(function(item){
+      var hasLinked = state.expense.some(function(e){
+        return e.monthly && e.linkedLiabilityId === item.id;
+      });
+      if(hasLinked) return;
       if(!(item.periods > 0 && item.monthlyPayment > 0 && item.repayDay > 0)) return;
       if(item.paidPeriods >= item.periods) return;
       if(!item.lastSettledMonth){
@@ -802,7 +1019,7 @@
 
         item.paidPeriods++;
         addToCash(-pay);
-        state.expense.push({ id: uid(), name: item.name + '月供', amount: pay, auto: true, month: mk, daily: false, date: '', time: Date.now() });
+        state.expense.push({ id: uid(), name: item.name + '月供', amount: pay, auto: true, month: mk, daily: false, date: '', time: Date.now(), monthly: false, monthlyDay: 0, linkedLiabilityId: '', paidTotal: 0, lastSettledMonth: null });
         state.ledger.push({ id: uid(), type: 'expense', name: item.name + '月供', amount: pay, month: mk, time: Date.now() });
         item.lastSettledMonth = mk;
         changed = true;
@@ -812,7 +1029,6 @@
     if(changed) saveState();
   }
 
-  /* ========= 渲染 ========= */
   function render(){
     titleEl.textContent = TITLES[currentTab];
     for(var i = 0; i < tabBtns.length; i++){
@@ -828,8 +1044,12 @@
     var totalReceived = state.income.reduce(function(s, it){ return s + (it.received || 0); }, 0);
     var cashFlow = state.asset.filter(function(a){ return a.liquid; }).reduce(function(s, a){ return s + a.amount; }, 0);
     var monthlyIncome = state.income.reduce(function(s, it){ return s + it.amount; }, 0);
-    var monthlyExpense = state.expense.filter(function(e){ return !e.auto; }).reduce(function(s, e){ return s + e.amount; }, 0)
-      + state.liability.filter(function(l){ return l.periods > 0 && l.monthlyPayment > 0; }).reduce(function(s, l){ return s + l.monthlyPayment; }, 0);
+    var monthlyExpense = state.expense.filter(function(e){ return !e.auto && !e.monthly; }).reduce(function(s, e){ return s + e.amount; }, 0)
+      + state.expense.filter(function(e){ return e.monthly && e.amount > 0; }).reduce(function(s, e){ return s + e.amount; }, 0)
+      + state.liability.filter(function(l){
+          var hasLinked = state.expense.some(function(e){ return e.monthly && e.linkedLiabilityId === l.id; });
+          return !hasLinked && l.periods > 0 && l.monthlyPayment > 0;
+        }).reduce(function(s, l){ return s + l.monthlyPayment; }, 0);
     var monthlyNet = round2(monthlyIncome - monthlyExpense);
     var totalCashFlow = round2(cashFlow + monthlyNet);
 
@@ -875,23 +1095,35 @@
     contentEl.innerHTML = html;
   }
 
-  /* 日历 HTML */
+  function buildSumList(arr){
+    var html = '<div class="cal-sum-list">';
+    if(!arr || arr.length === 0){
+      html += '<div class="cal-sum-empty">该时段暂无支出记录</div>';
+    } else {
+      arr.forEach(function(r){
+        html += '<div class="cal-sum-row">'
+             +   '<span class="cal-sum-name">' + esc(r.name) + '</span>'
+             +   '<span class="cal-sum-amt">-' + fmt(r.amount) + '</span>'
+             + '</div>';
+      });
+    }
+    html += '</div>';
+    return html;
+  }
+
   function buildCalendarHTML(){
     var daily = state.expense.filter(function(e){ return e.daily && e.date; });
-    var byDate = {}, byMonth = {}, byYear = {};
+    var byDate = {};
     daily.forEach(function(e){
-      var d = e.date;
-      byDate[d] = round2((byDate[d] || 0) + e.amount);
-      var mk = d.slice(0,7);
-      byMonth[mk] = round2((byMonth[mk] || 0) + e.amount);
-      var yk = d.slice(0,4);
-      byYear[yk] = round2((byYear[yk] || 0) + e.amount);
+      byDate[e.date] = round2((byDate[e.date] || 0) + e.amount);
     });
+
+    var totals = calcAllExpenseTotals();
 
     var y = calYear, m = calMonth;
     var monthKey = y + '-' + pad2(m + 1);
-    var monthTotal = byMonth[monthKey] || 0;
-    var yearTotal = byYear[String(y)] || 0;
+    var monthTotal = totals.byMonth[monthKey] || 0;
+    var yearTotal = totals.byYear[String(y)] || 0;
     var firstDay = new Date(y, m, 1).getDay();
     var days = new Date(y, m + 1, 0).getDate();
     var todayKey = todayDateKey();
@@ -902,15 +1134,21 @@
       +   '<button class="cal-nav" data-cal="prev-year">‹</button>'
       +   '<span class="cal-title">' + y + '年</span>'
       +   '<button class="cal-nav" data-cal="next-year">›</button>'
-      +   '<span class="cal-total">年支出 -' + fmt(yearTotal) + '</span>'
-      + '</div>'
-      + '<div class="cal-row">'
+      +   '<span class="cal-total cal-clickable' + (calSumMode === 'year' ? ' active' : '') + '" data-sum="year">年支出 -' + fmt(yearTotal) + '</span>'
+      + '</div>';
+
+    if(calSumMode === 'year') html += buildSumList(getExpenseSummary('year'));
+
+    html += '<div class="cal-row">'
       +   '<button class="cal-nav" data-cal="prev-month">‹</button>'
       +   '<span class="cal-title">' + (m + 1) + '月</span>'
       +   '<button class="cal-nav" data-cal="next-month">›</button>'
-      +   '<span class="cal-total">月支出 -' + fmt(monthTotal) + '</span>'
-      + '</div>'
-      + '<div class="cal-week"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>'
+      +   '<span class="cal-total cal-clickable' + (calSumMode === 'month' ? ' active' : '') + '" data-sum="month">月支出 -' + fmt(monthTotal) + '</span>'
+      + '</div>';
+
+    if(calSumMode === 'month') html += buildSumList(getExpenseSummary('month'));
+
+    html += '<div class="cal-week"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>'
       + '<div class="cal-grid">';
 
     for(var i = 0; i < firstDay; i++) html += '<div class="cal-cell empty"></div>';
@@ -927,7 +1165,6 @@
     }
     html += '</div>';
 
-    // 选中日期明细
     if(selected){
       var selRecords = state.expense.filter(function(e){ return e.daily && e.date === selected; });
       var selTotal = selRecords.reduce(function(s, e){ return s + e.amount; }, 0);
@@ -952,26 +1189,23 @@
   }
 
   function renderExpense(){
-    var total = state.expense.reduce(function(s, e){ return s + e.amount; }, 0);
+    var total = state.expense.reduce(function(s, e){
+      return s + (e.monthly ? (e.paidTotal || 0) : e.amount);
+    }, 0);
     var todayKey = todayDateKey();
     var todayRecords = state.expense.filter(function(e){ return e.daily && e.date === todayKey; });
     var todayTotal = todayRecords.reduce(function(s, e){ return s + e.amount; }, 0);
-    // 普通支出列表排除每日支出
     var normalExpenses = state.expense.filter(function(e){ return !e.daily; });
 
     var html = ''
       + '<div class="summary">'
-      +   '<div class="summary-header">'
-      +     '<div class="summary-label">支出合计</div>'
-      +   '</div>'
+      +   '<div class="summary-label">支出合计</div>'
       +   '<div class="summary-value neg">-' + fmt(total) + '</div>'
-      +   '<button class="dots-btn' + (calendarExpanded ? ' active' : '') + '" id="dotsBtn" aria-label="日历">•••</button>'
+      +   '<button class="cal-toggle' + (calendarExpanded ? ' active' : '') + '" id="calToggleBtn" aria-label="日历">⫶</button>'
       + '</div>';
 
-    // 日历
     if(calendarExpanded) html += buildCalendarHTML();
 
-    // 每日支出卡片
     var arrow = dailyExpanded ? '▲' : '▼';
     html += '<div class="daily-expense-card">'
          +   '<div class="item daily-expense-item" data-daily="1">'
@@ -982,7 +1216,6 @@
          +   '</div>';
 
     if(dailyExpanded){
-      // 快捷标签
       html += '<div class="daily-tags-panel">';
       state.dailyTags.forEach(function(tag){
         html += '<button class="daily-tag" data-tag="' + esc(tag) + '">' + esc(tag) + '</button>';
@@ -990,7 +1223,6 @@
       html += '<button class="daily-add" id="dailyAddBtn" aria-label="添加快捷标签">+</button>';
       html += '</div>';
 
-      // 今日支出明细（只在展开时显示）
       html += '<div class="daily-records">';
       if(todayRecords.length === 0){
         html += '<div class="daily-record empty-rec">今日暂无支出记录</div>';
@@ -1008,18 +1240,33 @@
     }
     html += '</div>';
 
-    // 普通支出列表（不含每日支出）
     if(normalExpenses.length === 0){
       html += '<div class="empty">暂无支出项目<br><span>点击右上角 ⊕ 添加</span></div>';
     } else {
       html += '<div class="list">';
       normalExpenses.forEach(function(it){
         var meta = [];
+        if(it.monthly){
+          meta.push('每月' + (it.monthlyDay || '?') + '号');
+          if(it.linkedLiabilityId){
+            var liab = state.liability.filter(function(x){ return x.id === it.linkedLiabilityId; })[0];
+            if(liab){
+              var rem = liabilityRemaining(liab);
+              meta.push('关联 ' + liab.name + '（剩余 ¥' + rem.toFixed(2) + '）');
+            }
+          }
+          if(it.paidTotal > 0) meta.push('已付 ' + fmt(it.paidTotal));
+        }
         if(it.auto && it.month) meta.push(it.month + ' 自动还款');
+
+        var tagHtml = '';
+        if(it.monthly) tagHtml += ' <span class="tag tag-monthly">每月</span>';
+        if(it.auto) tagHtml += ' <span class="tag">自动</span>';
+
         html += ''
           + '<div class="item" data-id="' + it.id + '"' + (it.auto ? ' data-auto="1"' : '') + '>'
           +   '<div class="item-main">'
-          +     '<div class="item-name">' + esc(it.name) + (it.auto ? ' <span class="tag">自动</span>' : '') + '</div>'
+          +     '<div class="item-name">' + esc(it.name) + tagHtml + '</div>'
           +     (meta.length ? '<div class="item-meta">' + meta.join(' · ') + '</div>' : '')
           +   '</div>'
           +   '<div class="item-amount neg">-' + fmt(it.amount) + '</div>'
@@ -1077,6 +1324,10 @@
           meta.push('月供 ' + fmt(it.monthlyPayment));
         }
         if(meta.length === 0) meta.push('简单负债');
+
+        var linkedExp = state.expense.filter(function(e){ return e.monthly && e.linkedLiabilityId === it.id; })[0];
+        if(linkedExp) meta.push('已关联「' + linkedExp.name + '」');
+
         html += ''
           + '<div class="item" data-id="' + it.id + '">'
           +   '<div class="item-main">'
@@ -1091,7 +1342,6 @@
     contentEl.innerHTML = html;
   }
 
-  /* ========= 导航 ========= */
   for(var i = 0; i < tabBtns.length; i++){
     tabBtns[i].addEventListener('click', function(){
       currentTab = this.dataset.tab;
@@ -1101,7 +1351,6 @@
     });
   }
 
-  /* ========= 弹出层 ========= */
   function openSheet(){
     maskEl.classList.add('show');
     document.body.style.overflow = 'hidden';
@@ -1109,6 +1358,9 @@
   function closeSheet(){
     maskEl.classList.remove('show');
     document.body.style.overflow = '';
+    maskEl.style.height = '';
+    maskEl.style.top = '';
+    maskEl.style.bottom = '';
     nameInput.blur();
     amountInput.blur();
     editingId = null;
@@ -1123,12 +1375,18 @@
   function resetFieldsForMode(){
     dayField.hidden = true;
     liquidField.hidden = true;
+    expenseTypeField.hidden = true;
+    monthlyDayField.hidden = true;
+    linkedLiabilityField.hidden = true;
     loanFields.hidden = true;
     paidField.hidden = true;
     amountField.hidden = false;
     deleteGuard.hidden = true;
     deleteBtn.hidden = true;
     captchaInput.value = '';
+    nameInput.readOnly = false;
+    nameInput.style.color = '';
+    nameInput.style.background = '';
   }
 
   function openEditor(item){
@@ -1141,6 +1399,8 @@
     amountInput.value = item ? (item.amount || '') : '';
     dayInput.value = '';
     liquidInput.value = '1';
+    expenseTypeInput.value = 'normal';
+    monthlyDayInput.value = '';
     totalInput.value = '';
     periodsInput.value = '';
     monthlyInput.value = '';
@@ -1159,6 +1419,16 @@
       if(item) dayInput.value = item.day || '';
     } else if(currentTab === 'expense'){
       amountLabel.textContent = '金额（元）';
+      expenseTypeField.hidden = false;
+      if(item && item.monthly){
+        expenseTypeInput.value = 'monthly';
+        monthlyDayField.hidden = false;
+        linkedLiabilityField.hidden = false;
+        monthlyDayInput.value = item.monthlyDay || '';
+        buildLiabilityOptions(item.linkedLiabilityId);
+      } else {
+        expenseTypeInput.value = 'normal';
+      }
     } else if(currentTab === 'asset'){
       amountLabel.textContent = '金额（元）';
       if(item) liquidInput.value = item.liquid ? '1' : '0';
@@ -1179,11 +1449,27 @@
       }
     }
 
+    if(item && isFixedItem(currentTab, item.name)){
+      nameInput.readOnly = true;
+      nameInput.style.color = '#999';
+    }
+
     openSheet();
-    if(!isEdit) setTimeout(function(){ nameInput.focus(); }, 280);
+    if(!isEdit) {
+      setTimeout(function(){ 
+        nameInput.focus(); 
+        setTimeout(function(){ nameInput.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 200);
+      }, 280);
+    }
   }
 
-  // 记录每日支出（带日期标记，可删除快捷标签）
+  expenseTypeInput.addEventListener('change', function(){
+    var isMonthly = this.value === 'monthly';
+    monthlyDayField.hidden = !isMonthly;
+    linkedLiabilityField.hidden = !isMonthly;
+    if(isMonthly) buildLiabilityOptions(linkedLiabilityInput.value);
+  });
+
   function openDailyExpense(tagName){
     editingId = null;
     sheetMode = 'daily';
@@ -1196,10 +1482,12 @@
     deleteBtn.textContent = '删除此快捷标签';
     deleteBtn.hidden = false;
     openSheet();
-    setTimeout(function(){ amountInput.focus(); }, 280);
+    setTimeout(function(){ 
+      amountInput.focus(); 
+      setTimeout(function(){ amountInput.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 200);
+    }, 280);
   }
 
-  // 添加快捷标签
   function openAddTag(){
     editingId = null;
     sheetMode = 'tag';
@@ -1209,18 +1497,19 @@
     amountField.hidden = true;
     deleteBtn.hidden = true;
     openSheet();
-    setTimeout(function(){ nameInput.focus(); }, 280);
+    setTimeout(function(){ 
+      nameInput.focus(); 
+      setTimeout(function(){ nameInput.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 200);
+    }, 280);
   }
 
   addBtn.addEventListener('click', function(){ openEditor(null); });
 
-  /* ========= 内容区点击 ========= */
   contentEl.addEventListener('click', function(e){
     var target = e.target;
 
-    // ••• 日历切换
-    var dots = target.closest ? target.closest('.dots-btn') : null;
-    if(dots){
+    var calToggle = target.closest ? target.closest('.cal-toggle') : null;
+    if(calToggle){
       calendarExpanded = !calendarExpanded;
       var st0 = contentEl.scrollTop;
       renderExpense();
@@ -1228,7 +1517,16 @@
       return;
     }
 
-    // 日历翻页
+    var sumBtn = target.closest ? target.closest('.cal-total[data-sum]') : null;
+    if(sumBtn){
+      var mode = sumBtn.dataset.sum;
+      calSumMode = (calSumMode === mode) ? '' : mode;
+      var stSum = contentEl.scrollTop;
+      renderExpense();
+      contentEl.scrollTop = stSum;
+      return;
+    }
+
     var calNav = target.closest ? target.closest('.cal-nav') : null;
     if(calNav){
       var act = calNav.dataset.cal;
@@ -1242,7 +1540,6 @@
       return;
     }
 
-    // 点击日历日期 -> 显示该日明细
     var calCell = target.closest ? target.closest('.cal-cell') : null;
     if(calCell && calCell.dataset.date){
       calSelectedDate = calCell.dataset.date;
@@ -1252,7 +1549,6 @@
       return;
     }
 
-    // 今日/日历中的支出明细 -> 编辑
     var rec = target.closest ? target.closest('.daily-record') : null;
     if(rec && rec.dataset.recId){
       var rid = rec.dataset.recId;
@@ -1261,7 +1557,6 @@
       return;
     }
 
-    // 每日支出展开/收起
     var dailyItem = target.closest ? target.closest('.daily-expense-item') : null;
     if(dailyItem){
       dailyExpanded = !dailyExpanded;
@@ -1271,21 +1566,18 @@
       return;
     }
 
-    // 快捷标签 -> 记录支出
     var tagBtn = target.closest ? target.closest('.daily-tag') : null;
     if(tagBtn){
       openDailyExpense(tagBtn.dataset.tag);
       return;
     }
 
-    // 绿色加号 -> 添加快捷标签
     var addTagBtn = target.closest ? target.closest('#dailyAddBtn') : null;
     if(addTagBtn){
       openAddTag();
       return;
     }
 
-    // 普通列表项编辑
     var itemEl = target.closest ? target.closest('.item') : null;
     if(!itemEl) return;
     if(itemEl.dataset.auto === '1'){
@@ -1298,9 +1590,7 @@
     openEditor(item);
   });
 
-  /* ========= 提交 ========= */
   function commit(){
-    // 添加快捷标签
     if(sheetMode === 'tag'){
       var tag = nameInput.value.trim();
       if(!tag){
@@ -1322,7 +1612,6 @@
       return;
     }
 
-    // 记录每日支出
     if(sheetMode === 'daily'){
       var dName = nameInput.value.trim();
       if(!dName){
@@ -1346,8 +1635,10 @@
         month: '',
         daily: true,
         date: todayDateKey(),
-        time: Date.now()
+        time: Date.now(),
+        monthly: false, monthlyDay: 0, linkedLiabilityId: '', paidTotal: 0, lastSettledMonth: null
       });
+      addToCash(-round2(dAmount));
       saveState();
       closeSheet();
       settle();
@@ -1355,7 +1646,6 @@
       return;
     }
 
-    // 普通项目编辑
     var name = nameInput.value.trim();
     if(!name){
       nameInput.classList.add('err');
@@ -1372,18 +1662,69 @@
       if(day > 31) day = 31;
       if(editingId){
         var it = state.income.filter(function(x){ return x.id === editingId; })[0];
-        if(it){ it.name = name; it.amount = round2(amount); it.day = day; }
+        if(it){
+          if(!isFixedItem('income', it.name)) it.name = name;
+          it.amount = round2(amount);
+          it.day = day;
+        }
       } else {
-        state.income.push({ id: uid(), name: name, amount: round2(amount), day: day, received: 0, lastSettledMonth: initLastSettled(day) });
+        state.income.push({ id: uid(), name: name, amount: round2(amount), day: day, received: 0, lastSettledMonth: initLastSettled(day), fixed: isFixedItem('income', name) });
       }
     } else if(currentTab === 'expense'){
       var amount2 = parseFloat(amountInput.value);
       if(isNaN(amount2) || amount2 < 0) amount2 = 0;
+      var isMonthly = (expenseTypeInput.value === 'monthly');
+      var monthlyDay = parseInt(monthlyDayInput.value, 10) || 0;
+      var linkedId = linkedLiabilityInput.value || '';
+
+      if(isMonthly && monthlyDay < 1){
+        monthlyDayInput.classList.add('err');
+        monthlyDayInput.focus();
+        setTimeout(function(){ monthlyDayInput.classList.remove('err'); }, 1200);
+        return;
+      }
+      if(monthlyDay > 31) monthlyDay = 31;
+
       if(editingId){
         var it2 = state.expense.filter(function(x){ return x.id === editingId; })[0];
-        if(it2){ it2.name = name; it2.amount = round2(amount2); }
+        if(it2){
+          var oldAmount = Number(it2.amount) || 0;
+          var wasMonthly = !!it2.monthly;
+          var wasAuto = !!it2.auto;
+          it2.name = name;
+          it2.amount = round2(amount2);
+          if(isMonthly){
+            it2.monthly = true;
+            it2.monthlyDay = monthlyDay;
+            it2.linkedLiabilityId = linkedId;
+            if(!it2.lastSettledMonth) it2.lastSettledMonth = initLastSettled(monthlyDay);
+            if(!it2.date) it2.date = '';
+          } else {
+            it2.monthly = false;
+            it2.monthlyDay = 0;
+            it2.linkedLiabilityId = '';
+            it2.paidTotal = 0;
+            it2.lastSettledMonth = null;
+            if(!it2.date) it2.date = todayDateKey();
+          }
+          if(!wasMonthly && !wasAuto && !isMonthly){
+            var diff = round2(amount2 - oldAmount);
+            if(diff !== 0) addToCash(-diff);
+          }
+        }
       } else {
-        state.expense.push({ id: uid(), name: name, amount: round2(amount2), auto: false, month: '', daily: false, date: '', time: Date.now() });
+        state.expense.push({
+          id: uid(), name: name, amount: round2(amount2),
+          auto: false, month: '', daily: false,
+          date: isMonthly ? '' : todayDateKey(),
+          time: Date.now(),
+          monthly: isMonthly,
+          monthlyDay: isMonthly ? monthlyDay : 0,
+          linkedLiabilityId: isMonthly ? linkedId : '',
+          paidTotal: 0,
+          lastSettledMonth: isMonthly ? initLastSettled(monthlyDay) : null
+        });
+        if(!isMonthly) addToCash(-round2(amount2));
       }
     } else if(currentTab === 'asset'){
       var amount3 = parseFloat(amountInput.value);
@@ -1391,9 +1732,13 @@
       var liquid = liquidInput.value === '1';
       if(editingId){
         var it3 = state.asset.filter(function(x){ return x.id === editingId; })[0];
-        if(it3){ it3.name = name; it3.amount = round2(amount3); it3.liquid = liquid; }
+        if(it3){
+          if(!isFixedItem('asset', it3.name)) it3.name = name;
+          it3.amount = round2(amount3);
+          it3.liquid = liquid;
+        }
       } else {
-        state.asset.push({ id: uid(), name: name, amount: round2(amount3), liquid: liquid });
+        state.asset.push({ id: uid(), name: name, amount: round2(amount3), liquid: liquid, fixed: isFixedItem('asset', name) });
       }
     } else if(currentTab === 'liability'){
       var total = parseFloat(totalInput.value) || 0;
@@ -1441,7 +1786,6 @@
 
   confirmBtn.addEventListener('click', commit);
 
-  /* ========= 删除（带验证码） ========= */
   deleteBtn.addEventListener('click', function(){
     if(sheetMode === 'daily'){
       pendingDeleteType = 'tag';
@@ -1476,6 +1820,10 @@
     }
 
     if(!editingId) return;
+    var delItem = state[currentTab].filter(function(x){ return x.id === editingId; })[0];
+    if(currentTab === 'expense' && delItem && !delItem.monthly && !delItem.auto){
+      addToCash(Number(delItem.amount) || 0);
+    }
     state[currentTab] = state[currentTab].filter(function(x){ return x.id !== editingId; });
     saveState();
     closeSheet();
@@ -1499,7 +1847,6 @@
     if(e.key === 'Enter'){ e.preventDefault(); commit(); }
   });
 
-  /* ========= 每日 00:00 自动刷新 ========= */
   setInterval(function(){
     var k = todayDateKey();
     if(k !== lastDayKey){
